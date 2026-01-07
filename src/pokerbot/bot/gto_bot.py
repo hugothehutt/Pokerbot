@@ -28,6 +28,9 @@ class GTOBot(BaseBot):
 
     def __init__(self, config: Optional[BotConfig] = None):
         """Initialize the GTO bot."""
+        if config is None:
+            config = BotConfig(name="GTO")
+        
         super().__init__(config)
 
         self.decision_engine = DecisionEngine(
