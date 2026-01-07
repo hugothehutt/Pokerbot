@@ -241,8 +241,10 @@ class GameRunner:
 
         lines = []
         lines.append(self._header())
-        lines.append(f"  HAND #{self.table.hand_number}  |  Pot: ${self.table.pot:.2f}  |  "
-                     f"Street: {self.table.street.name}")
+        header_info = f"  HAND #{self.table.hand_number}  |  Pot: ${self.table.pot:.2f}  |  Street: {self.table.street.name}"
+        if self.config.ante > 0:
+            header_info += f"  |  Ante: ${self.config.ante:.2f}"
+        lines.append(header_info)
         lines.append(self._separator())
 
         # Board

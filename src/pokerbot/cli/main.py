@@ -270,6 +270,7 @@ def cmd_play(args: argparse.Namespace) -> None:
         num_seats=min(6, len(bots) + 1),
         small_blind=args.sb,
         big_blind=args.bb,
+        ante=args.ante,
         starting_stack=args.stack,
         show_equity=not args.no_equity,
         show_stats=True,
@@ -281,7 +282,10 @@ def cmd_play(args: argparse.Namespace) -> None:
 
     print_banner()
     print(f"\nStarting {config.num_seats}-handed game")
-    print(f"Blinds: ${config.small_blind:.2f}/${config.big_blind:.2f}")
+    blinds_str = f"Blinds: ${config.small_blind:.2f}/${config.big_blind:.2f}"
+    if config.ante > 0:
+        blinds_str += f" (ante: ${config.ante:.2f})"
+    print(blinds_str)
     print(f"Starting stack: ${config.starting_stack:.2f}")
     print(f"\nOpponents:")
     for bot in bots:
@@ -453,6 +457,8 @@ Examples:
                             help='Small blind amount (default: 0.5)')
     play_parser.add_argument('--bb', type=float, default=1.0,
                             help='Big blind amount (default: 1.0)')
+    play_parser.add_argument('--ante', '-a', type=float, default=0.0,
+                            help='Ante amount per player (default: 0, common: 0.1-0.25 BB)')
     play_parser.add_argument('--hands', '-n', type=int, default=0,
                             help='Number of hands to play (0 = unlimited)')
     play_parser.add_argument('--name', help='Your player name (default: Hero)')
