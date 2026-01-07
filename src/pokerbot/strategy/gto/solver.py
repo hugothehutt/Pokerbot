@@ -113,7 +113,10 @@ class SimpleSolver:
         Returns:
             Optimal bluff frequency (0-1)
         """
-        return bet_size / (pot + 2 * bet_size)
+        denominator = pot + 2 * bet_size
+        if denominator == 0:
+            return 0.0
+        return bet_size / denominator
 
     @staticmethod
     def value_to_bluff_ratio(bet_size: float, pot: float) -> float:
@@ -130,6 +133,8 @@ class SimpleSolver:
         Returns:
             Ratio of value bets to bluffs
         """
+        if bet_size == 0:
+            return float('inf')
         return (pot + bet_size) / bet_size
 
     @staticmethod
@@ -258,12 +263,15 @@ class SimpleSolver:
                 node.check_freq = 0.7
             else:
                 # Weak - check or bluff
-                optimal_bluff = self.optimal_bluff_frequency(pot * 0.67, pot)
+                # Use minimum bet size of 1 to avoid division by zero
+                bet_size = max(pot * 0.67, 1.0)
+                optimal_bluff = self.optimal_bluff_frequency(bet_size, pot)
                 node.bet_freq = min(optimal_bluff, 0.3)  # Cap bluffs
                 node.check_freq = 1.0 - node.bet_freq
 
-        # Calculate EVs
-        node.action_evs = self.calculate_ev(pot, facing_bet or pot * 0.67, our_equity)
+        # Calculate EVs - use minimum bet size to avoid division issues
+        ev_bet_size = facing_bet if facing_bet > 0 else max(pot * 0.67, 1.0)
+        node.action_evs = self.calculate_ev(pot, ev_bet_size, our_equity)
 
         return node
 
