@@ -8,6 +8,7 @@ Commands:
 - preflop: Get preflop recommendations
 - range: Display hand ranges
 - simulate: Run simulations
+- play: Play interactive poker against AI bots
 """
 
 from __future__ import annotations
@@ -226,6 +227,71 @@ def cmd_simulate(args: argparse.Namespace) -> None:
     print(f"\n{analysis}")
 
 
+def cmd_play(args: argparse.Namespace) -> None:
+    """Play interactive poker against AI bots."""
+    from pokerbot.simulation.runner import GameRunner, GameConfig
+    from pokerbot.bot import NitBot, FishBot, LAGBot, ManiacBot, CallingStationBot, GTOBot
+
+    # Build bot selection
+    bot_types = {
+        'nit': NitBot,
+        'fish': FishBot,
+        'lag': LAGBot,
+        'maniac': ManiacBot,
+        'calling': CallingStationBot,
+        'station': CallingStationBot,
+        'gto': GTOBot,
+        'tag': GTOBot,  # TAG is essentially GTO
+    }
+
+    # Parse opponent types
+    if args.opponents:
+        opponent_names = [o.strip().lower() for o in args.opponents.split(',')]
+        bots = []
+        for name in opponent_names[:5]:  # Max 5 opponents
+            if name in bot_types:
+                bots.append(bot_types[name]())
+            else:
+                print(f"Unknown bot type: {name}")
+                print(f"Available types: {', '.join(bot_types.keys())}")
+                return
+    else:
+        # Default mix of opponents
+        bots = [
+            NitBot(),
+            FishBot(),
+            LAGBot(),
+            ManiacBot(),
+            CallingStationBot(),
+        ]
+
+    # Create game config
+    config = GameConfig(
+        num_seats=min(6, len(bots) + 1),
+        small_blind=args.sb,
+        big_blind=args.bb,
+        starting_stack=args.stack,
+        show_equity=not args.no_equity,
+        show_stats=True,
+    )
+
+    # Create and setup game
+    runner = GameRunner(config)
+    runner.setup_table(bots, human_seat=0, human_name=args.name or "Hero")
+
+    print_banner()
+    print(f"\nStarting {config.num_seats}-handed game")
+    print(f"Blinds: ${config.small_blind:.2f}/${config.big_blind:.2f}")
+    print(f"Starting stack: ${config.starting_stack:.2f}")
+    print(f"\nOpponents:")
+    for bot in bots:
+        print(f"  - {bot.name}")
+    print()
+
+    # Run the game
+    runner.run(num_hands=args.hands)
+
+
 def cmd_interactive(args: argparse.Namespace) -> None:
     """Run interactive mode."""
     print_banner()
@@ -377,6 +443,22 @@ Examples:
     sim_parser.add_argument('--board', '-b', help='Board cards')
     sim_parser.add_argument('--villain', '-v', help='Villain range')
 
+    # Play command
+    play_parser = subparsers.add_parser('play', help='Play interactive poker against AI bots')
+    play_parser.add_argument('--opponents', '-o',
+                            help='Comma-separated bot types: nit,fish,lag,maniac,calling,gto')
+    play_parser.add_argument('--stack', type=float, default=100.0,
+                            help='Starting stack in big blinds (default: 100)')
+    play_parser.add_argument('--sb', type=float, default=0.5,
+                            help='Small blind amount (default: 0.5)')
+    play_parser.add_argument('--bb', type=float, default=1.0,
+                            help='Big blind amount (default: 1.0)')
+    play_parser.add_argument('--hands', '-n', type=int, default=0,
+                            help='Number of hands to play (0 = unlimited)')
+    play_parser.add_argument('--name', help='Your player name (default: Hero)')
+    play_parser.add_argument('--no-equity', action='store_true',
+                            help='Disable equity display')
+
     args = parser.parse_args()
 
     if args.command == 'equity':
@@ -389,6 +471,8 @@ Examples:
         cmd_range(args)
     elif args.command == 'simulate':
         cmd_simulate(args)
+    elif args.command == 'play':
+        cmd_play(args)
     else:
         # No command - run interactive mode
         cmd_interactive(args)

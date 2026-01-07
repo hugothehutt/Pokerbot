@@ -108,6 +108,32 @@ class PreflopRanges:
             "43s,42s,"
             "32s"
         ),
+        # BB raise range (vs limpers or heads-up) - very wide since we close action
+        Position.BB: (
+            "AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,"
+            "AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,"
+            "AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,A2o,"
+            "KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,K3s,K2s,"
+            "KQo,KJo,KTo,K9o,K8o,K7o,K6o,K5o,"
+            "QJs,QTs,Q9s,Q8s,Q7s,Q6s,Q5s,Q4s,Q3s,Q2s,"
+            "QJo,QTo,Q9o,Q8o,Q7o,"
+            "JTs,J9s,J8s,J7s,J6s,J5s,J4s,J3s,"
+            "JTo,J9o,J8o,J7o,"
+            "T9s,T8s,T7s,T6s,T5s,T4s,"
+            "T9o,T8o,T7o,"
+            "98s,97s,96s,95s,94s,"
+            "98o,97o,"
+            "87s,86s,85s,84s,83s,"
+            "87o,86o,"
+            "76s,75s,74s,73s,"
+            "76o,75o,"
+            "65s,64s,63s,62s,"
+            "65o,"
+            "54s,53s,52s,"
+            "54o,"
+            "43s,42s,"
+            "32s"
+        ),
     }
 
     # 3-bet ranges vs different positions
