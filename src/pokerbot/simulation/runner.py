@@ -227,9 +227,13 @@ class GameRunner:
 
             acted.add(current)
 
-            # Check if only one player remains
+            # Check if only one player remains or all remaining are all-in
             in_hand = [i for i in range(self.config.num_seats) if self.table.in_hand[i]]
             if len(in_hand) <= 1:
+                break
+            # Check if all remaining players are all-in (no more betting possible)
+            active_non_allin = [i for i in in_hand if not self.table.all_in[i]]
+            if len(active_non_allin) == 0:
                 break
 
             # Next player still in the hand
